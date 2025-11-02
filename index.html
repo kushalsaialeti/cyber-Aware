@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Defense Awareness Quiz</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="script.js" defer></script>
+    <style>
+        /* Define custom styles and animations for the dramatic feedback */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1f2937 0%, #0f172a 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .game-card {
+            background: rgba(30, 41, 59, 0.95); /* Slate 800 with transparency */
+            border: 2px solid #3b82f6; /* Blue border */
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+        }
+
+        /* --- RED HAZARD SCREEN STYLES (Simplified) --- */
+        #hazard-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none; 
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            text-align: center;
+            backdrop-filter: blur(5px);
+            background-color: rgba(234, 88, 12, 0.98); /* Orange 600 for Alert/Danger */
+            color: white;
+            border: 8px solid #b45309; /* Deep Orange Border */
+        }
+
+        #hazard-overlay h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 8px rgba(253, 186, 116, 0.7);
+        }
+
+        /* --- KNOWLEDGE POPUP STYLES --- */
+        #knowledge-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            width: 90%;
+            max-width: 400px;
+            background: #10b981; /* Emerald 500 */
+            color: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            display: none;
+            opacity: 0;
+            z-index: 999;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); 
+        }
+
+        .popup-show {
+            opacity: 1 !important;
+            transform: translate(-50%, -50%) scale(1) !important;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: 100;
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+        
+        /* Custom Button Styling */
+        .answer-btn {
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px #1e40af; 
+        }
+
+        .answer-btn:hover:not(:disabled) {
+            transform: translateY(1px);
+            box-shadow: 0 3px #1e40af;
+        }
+
+        .answer-btn:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        /* Styling for Multi-Select selected state */
+        .selected-answer {
+            background-color: #f59e0b !important; /* Amber 500 */
+            border: 2px solid #b45309; /* Amber 700 */
+            box-shadow: 0 3px #b45309;
+        }
+    </style>
+</head>
+<body class="p-4">
+
+    <!-- Red Hazard Screen Overlay (for incorrect answers) -->
+    <div id="hazard-overlay" class="p-8">
+        <button id="hazard-close-btn" class="close-btn text-white hover:text-gray-300">&times;</button>
+        <h2 class="mb-6 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mr-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8.257 3.34c.73-.594 1.73-.594 2.46 0l5.48 4.416A3 3 0 0118 10.386v4.214a4 4 0 01-4 4H6a4 4 0 01-4-4v-4.214c0-1.164.54-2.28 1.487-3.03l5.48-4.415zM11 14a1 1 0 10-2 0 1 1 0 002 0zm-1-7a1 1 0 00-1 1v3a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+            SYSTEM ALERT!
+        </h2>
+        <p id="hazard-explanation" class="text-xl max-w-2xl font-semibold mb-4"></p>
+        <p class="text-lg mt-4 font-bold text-yellow-200">⚠️ READ THIS ADVICE TO STAY SAFE! (Auto-close in 3s or click X)</p>
+    </div>
+
+    <!-- Knowledge Point Pop-up (for correct answers) -->
+    <div id="knowledge-popup">
+        <button id="knowledge-close-btn" class="close-btn text-white hover:text-gray-200">&times;</button>
+        <div class="text-center">
+            <h3 class="text-2xl font-bold mb-2">✅ Correct Answer!</h3>
+            <p class="text-sm font-light mb-4">You've earned a Cybersecurity Knowledge Point!</p>
+            <p id="knowledge-text" class="text-base italic font-medium"></p>
+        </div>
+    </div>
+
+    <!-- Landing Page -->
+    <div id="landing-page" class="game-card max-w-2xl mx-auto mt-20 p-8 rounded-xl">
+        <h1 class="text-4xl font-extrabold text-blue-400 mb-4 font-orbitron">Cyber Defense Awareness Quiz</h1>
+        <p class="text-gray-300 text-lg mb-8">Test your knowledge on daily scams, strong passwords, and data safety. This is a **20-question, self-paced** quiz designed for non-technical users to improve awareness.</p>
+        <button id="start-game-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition duration-200 transform hover:scale-105 shadow-lg">
+            Start Awareness Training
+        </button>
+    </div>
+
+    <!-- Game Page -->
+    <main id="game-container" class="max-w-xl mx-auto mt-10 p-6 rounded-xl game-card hidden">
+        
+        <!-- Progress & Score Display -->
+        <div class="flex justify-between items-center mb-6 text-gray-200">
+            <div id="progress-display" class="font-mono text-xl bg-gray-700 py-2 px-4 rounded-md border border-gray-600">
+                Q <span id="current-q-num">1</span> / <span id="total-questions">20</span>
+            </div>
+            <div class="font-mono text-xl bg-gray-700 py-2 px-4 rounded-md border border-gray-600">
+                Score: <span id="current-score" class="text-green-400 font-bold">0</span>
+            </div>
+        </div>
+
+        <!-- Question Section -->
+        <section id="question-section">
+            <h2 id="question-text" class="text-2xl font-semibold text-white mb-6">Question will appear here...</h2>
+            
+            <div id="multi-select-prompt" class="text-yellow-400 text-sm font-bold mb-3 hidden">
+                **MULTI-SELECT:** Click all the correct options, then click SUBMIT.
+            </div>
+
+            <div id="answers" class="grid grid-cols-1 gap-4">
+                <!-- Answer buttons dynamically populated by JS -->
+            </div>
+
+            <button id="submit-btn" class="hidden mt-6 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition duration-200 transform hover:scale-105 shadow-lg" disabled>
+                SUBMIT ANSWER
+            </button>
+        </section>
+
+        <!-- Game Over Section -->
+        <section id="score-section" class="hidden text-white text-center p-8">
+            <h2 id="final-message" class="text-4xl font-extrabold text-blue-400 mb-4 font-orbitron">MISSION COMPLETE!</h2>
+            <p class="text-xl mb-4">Your final awareness score is: <span id="final-score" class="font-bold text-green-400"></span></p>
+            <p id="score-advice" class="text-lg mb-8 text-gray-300"></p>
+
+            <div class="text-left bg-gray-800 p-6 rounded-lg mb-8">
+                <h3 class="text-xl font-bold text-yellow-400 mb-3">Continue Your Learning:</h3>
+                <p class="text-sm text-gray-400 mb-2">Here are some recommended resources to boost your security knowledge:</p>
+                <ul class="list-disc list-inside text-sm text-blue-300 space-y-1">
+                    <li><a href="https://staysafeonline.org/" target="_blank" class="hover:underline">National Cyber Security Alliance (NCSA) Blog</a></li>
+                    <li><a href="https://krebsonsecurity.com/" target="_blank" class="hover:underline">Krebs on Security (for deep dives into real hacks)</a></li>
+                    <li><a href="https://www.cisa.gov/cyber-hygiene-vulnerability-management" target="_blank" class="hover:underline">CISA Cyber Hygiene Resources</a></li>
+                </ul>
+            </div>
+
+            <button id="restart-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition duration-200 transform hover:scale-105">
+                Rerun Simulation
+            </button>
+        </section>
+        
+    </main>
+
+    <footer class="text-center text-gray-500 p-4 mt-8">
+        <p class="text-sm">Quiz developed for public cybersecurity awareness.</p>
+    </footer>
+
+    </body>
+</html>
