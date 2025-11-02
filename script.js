@@ -245,15 +245,20 @@
             ];
 
             // --- DOM Elements ---
+            const body = document.body;
             const landingPage = document.getElementById("landing-page");
             const gameContainer = document.getElementById("game-container");
-            const startGameBtn = document.getElementById("start-game-btn");
+            const blogSection = document.getElementById("blog-section");
+            const startQuizBtn = document.getElementById("start-quiz-btn");
+            const viewBlogsBtn = document.getElementById("view-blogs-btn");
+            const closeQuizBtn = document.getElementById("close-quiz-btn");
+            const backToMenuBlogsBtn = document.getElementById("back-to-menu-blogs-btn");
+            
             const questionText = document.getElementById("question-text");
             const answerContainer = document.getElementById("answers");
             const submitBtn = document.getElementById("submit-btn");
             const multiSelectPrompt = document.getElementById("multi-select-prompt");
             
-            const progressDisplay = document.getElementById("progress-display");
             const currentQNumDisplay = document.getElementById("current-q-num");
             const currentScoreDisplay = document.getElementById("current-score");
             const totalQuestionsDisplay = document.getElementById("total-questions");
@@ -271,97 +276,157 @@
             const knowledgeText = document.getElementById("knowledge-text");
             const knowledgeCloseBtn = document.getElementById("knowledge-close-btn");
 
+            // Navigation Buttons
+            const prevQBtn = document.getElementById("prev-q-btn");
+            const nextQBtn = document.getElementById("next-q-btn");
+            const themeToggleBtn = document.getElementById("theme-toggle");
+            const sunIcon = document.getElementById("sun-icon");
+            const moonIcon = document.getElementById("moon-icon");
+
             // --- Game State ---
+            let quizHistory = [];
             let currentQuestionIndex = 0;
             let score = 0;
-            let isPaused = false;
-            let selectedAnswers = []; 
+            let isPaused = false; 
+            let isDarkTheme = true;
 
             totalQuestionsDisplay.textContent = questions.length;
 
-            // --- Event Listeners ---
-            startGameBtn.addEventListener("click", () => {
+            // --- View Management ---
+
+            function showView(view) {
                 landingPage.classList.add('hidden');
-                gameContainer.classList.remove('hidden');
-                startGame();
-            });
+                gameContainer.classList.add('hidden');
+                blogSection.classList.add('hidden');
+
+                if (view === 'home') {
+                    landingPage.classList.remove('hidden');
+                } else if (view === 'quiz') {
+                    gameContainer.classList.remove('hidden');
+                } else if (view === 'blogs') {
+                    blogSection.classList.remove('hidden');
+                }
+            }
+
+            // --- Theme Management ---
+            function toggleTheme() {
+                isDarkTheme = !isDarkTheme;
+                body.classList.toggle('light', !isDarkTheme);
+                body.classList.toggle('dark', isDarkTheme);
+                sunIcon.classList.toggle('hidden', !isDarkTheme);
+                moonIcon.classList.toggle('hidden', isDarkTheme);
+            }
             
-            restartButton.addEventListener("click", () => {
-                location.reload(); // Simple reload for a full reset
-            });
-
-            submitBtn.addEventListener('click', () => {
-                const currentQuestion = questions[currentQuestionIndex];
-                if (currentQuestion.type === 'multi-select' && !isPaused) {
-                    checkMultiSelectAnswer(currentQuestion);
-                }
-            });
-
-            knowledgeCloseBtn.addEventListener('click', () => {
-                // Manually close correct popup
-                if (isPaused) {
-                    hideFeedbackAndProceed();
-                }
-            });
-
-            hazardCloseBtn.addEventListener('click', () => {
-                // Manually close incorrect popup
-                if (isPaused) {
-                    hideFeedbackAndProceed();
-                }
-            });
-
             // --- Core Game Functions ---
 
             function startGame() {
-                shuffleArray(questions);
+                // Initialize quiz history with a deep copy of questions, adding state tracking
+                quizHistory = JSON.parse(JSON.stringify(questions)).map(q => ({
+                    ...q,
+                    userSelection: [], // Array of selected answer IDs
+                    isAnswered: false,
+                    isCorrect: null // null, true, or false
+                }));
+                shuffleArray(quizHistory);
+                
                 currentQuestionIndex = 0;
                 score = 0;
                 isPaused = false;
                 currentScoreDisplay.textContent = score;
+                scoreSection.classList.add('hidden');
                 document.getElementById("question-section").classList.remove('hidden'); 
                 showQuestion();
+                showView('quiz');
             }
 
             function shuffleArray(array) {
-                for (let i = array.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [array[i], array[j]] = [array[j], array[i]];
+                // Only shuffle if it's the beginning of a new game, not on reload/restart
+                if (currentQuestionIndex === 0) {
+                    for (let i = array.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [array[i], array[j]] = [array[j], array[i]];
+                    }
                 }
             }
 
             function showQuestion() {
-                if (currentQuestionIndex >= questions.length) {
+                if (currentQuestionIndex < 0) currentQuestionIndex = 0;
+                if (currentQuestionIndex >= quizHistory.length) {
                     endGame();
                     return;
                 }
                 
-                const currentQuestion = questions[currentQuestionIndex];
+                const questionData = quizHistory[currentQuestionIndex];
                 currentQNumDisplay.textContent = currentQuestionIndex + 1;
-                questionText.textContent = currentQuestion.question;
+                questionText.textContent = questionData.question;
                 
                 answerContainer.innerHTML = ''; 
-                selectedAnswers = []; 
+                isPaused = false; // Ensure unpaused when question loads
 
-                const isMultiSelect = currentQuestion.type === 'multi-select';
+                const isMultiSelect = questionData.type === 'multi-select';
                 submitBtn.classList.toggle('hidden', !isMultiSelect);
                 multiSelectPrompt.classList.toggle('hidden', !isMultiSelect);
-                submitBtn.disabled = true;
+                
+                const hasBeenAnswered = questionData.isAnswered;
 
                 // Create and attach new buttons
-                currentQuestion.answers.forEach((answer) => {
+                questionData.answers.forEach((answer) => {
                     const button = document.createElement('button');
-                    button.classList.add('answer-btn', 'bg-indigo-500', 'text-white', 'py-3', 'px-4', 'rounded-lg', 'font-medium', 'shadow-md');
+                    button.classList.add('answer-btn', 'bg-indigo-500', 'text-white', 'py-3', 'px-4', 'rounded-lg', 'font-medium', 'shadow-md', 'disabled:opacity-75');
                     button.textContent = answer.text;
                     button.setAttribute('data-answer-id', answer.id);
-                    
+
+                    const isSelected = questionData.userSelection.includes(answer.id);
+
+                    if (isSelected) {
+                        button.classList.add('selected-answer');
+                    }
+                    if (hasBeenAnswered) {
+                        button.disabled = true;
+                        // Visual feedback for correctness on answered questions
+                        if (answer.correct) {
+                            button.classList.add('bg-green-600');
+                            button.classList.remove('bg-indigo-500');
+                        } else if (isSelected && !answer.correct) {
+                            button.classList.add('bg-red-600');
+                            button.classList.remove('bg-indigo-500');
+                        }
+                    }
+
                     if (isMultiSelect) {
                         button.onclick = () => handleMultiSelectClick(button, answer.id);
                     } else {
-                        button.onclick = () => checkSingleSelectAnswer(answer.correct, currentQuestion);
+                        button.onclick = () => checkSingleSelectAnswer(answer.correct, questionData, answer.id, button);
                     }
                     answerContainer.appendChild(button);
                 });
+
+                // Update Submit button state and navigation buttons
+                submitBtn.disabled = questionData.userSelection.length === 0 || hasBeenAnswered;
+                submitBtn.onclick = () => checkMultiSelectAnswer(questionData);
+                
+                updateNavigationButtons();
+            }
+
+            function updateNavigationButtons() {
+                // Update Previous button state (disabled only on the first question)
+                prevQBtn.disabled = currentQuestionIndex === 0;
+
+                const isLastQuestion = currentQuestionIndex === quizHistory.length - 1;
+                
+                if (isLastQuestion) {
+                    nextQBtn.textContent = "Finish Quiz";
+                    // Permanently enabled for immediate quiz completion
+                    nextQBtn.disabled = false;
+                    nextQBtn.classList.remove('bg-blue-600');
+                    nextQBtn.classList.add('bg-green-600');
+                } else {
+                    nextQBtn.textContent = "Next \u2192";
+                    // Permanently enabled for free navigation
+                    nextQBtn.disabled = false;
+                    nextQBtn.classList.add('bg-blue-600');
+                    nextQBtn.classList.remove('bg-green-600');
+                }
             }
 
             // --- Multi-Select Logic ---
@@ -369,68 +434,121 @@
             function handleMultiSelectClick(button, answerId) {
                 if (isPaused) return;
 
-                const index = selectedAnswers.indexOf(answerId);
+                const index = quizHistory[currentQuestionIndex].userSelection.indexOf(answerId);
                 
                 if (index > -1) {
-                    selectedAnswers.splice(index, 1);
+                    quizHistory[currentQuestionIndex].userSelection.splice(index, 1);
                     button.classList.remove('selected-answer');
                 } else {
-                    selectedAnswers.push(answerId);
+                    quizHistory[currentQuestionIndex].userSelection.push(answerId);
                     button.classList.add('selected-answer');
                 }
                 
                 // Enable/disable submit button
-                submitBtn.disabled = selectedAnswers.length === 0;
+                submitBtn.disabled = quizHistory[currentQuestionIndex].userSelection.length === 0;
             }
 
-            function checkMultiSelectAnswer(question) {
+            function checkMultiSelectAnswer(questionData) {
                 isPaused = true;
                 
+                // Disable buttons and submit
                 answerContainer.querySelectorAll('.answer-btn').forEach(btn => btn.disabled = true);
                 submitBtn.disabled = true;
 
-                const correctAnswers = question.answers.filter(a => a.correct).map(a => a.id);
+                const correctAnswers = questionData.answers.filter(a => a.correct).map(a => a.id);
+                const userSelection = questionData.userSelection;
+                
                 const isCorrect = (
-                    selectedAnswers.length === correctAnswers.length &&
-                    selectedAnswers.every(id => correctAnswers.includes(id))
+                    userSelection.length === correctAnswers.length &&
+                    userSelection.every(id => correctAnswers.includes(id))
                 );
-
+                
+                // Update history
+                questionData.isAnswered = true;
+                questionData.isCorrect = isCorrect;
+                
+                // Score update
                 if (isCorrect) {
                     score++;
                     currentScoreDisplay.textContent = score;
-                    showCorrectFeedback(question.knowledgePoint);
+                    showCorrectFeedback(questionData.knowledgePoint);
                 } else {
-                    showIncorrectFeedback(question.incorrectFeedback);
+                    showIncorrectFeedback(questionData.incorrectFeedback);
                 }
+                
+                // Show visual feedback on the buttons
+                questionData.answers.forEach(answer => {
+                    const button = answerContainer.querySelector(`[data-answer-id="${answer.id}"]`);
+                    if (answer.correct) {
+                        button.classList.remove('bg-indigo-500', 'selected-answer');
+                        button.classList.add('bg-green-600');
+                    } else if (userSelection.includes(answer.id) && !answer.correct) {
+                        button.classList.remove('bg-indigo-500', 'selected-answer');
+                        button.classList.add('bg-red-600');
+                    }
+                });
+                
+                updateNavigationButtons();
             }
             
             // --- Single-Select Logic (MCQ/Boolean) ---
-            function checkSingleSelectAnswer(isCorrect, question) {
+            function checkSingleSelectAnswer(isCorrect, questionData, answerId, selectedButton) {
                 isPaused = true;
                 
+                // Disable all buttons
                 answerContainer.querySelectorAll('.answer-btn').forEach(button => button.disabled = true);
 
+                // Update history
+                questionData.userSelection = [answerId];
+                questionData.isAnswered = true;
+                questionData.isCorrect = isCorrect;
+                
+                // Score update
                 if (isCorrect) {
                     score++;
                     currentScoreDisplay.textContent = score;
-                    showCorrectFeedback(question.knowledgePoint);
+                    showCorrectFeedback(questionData.knowledgePoint);
+                    selectedButton.classList.remove('bg-indigo-500');
+                    selectedButton.classList.add('bg-green-600');
                 } else {
-                    showIncorrectFeedback(question.incorrectFeedback);
+                    showIncorrectFeedback(questionData.incorrectFeedback);
+                    selectedButton.classList.remove('bg-indigo-500');
+                    selectedButton.classList.add('bg-red-600');
+                    
+                    // Highlight correct answer
+                    questionData.answers.forEach(answer => {
+                        if (answer.correct) {
+                            answerContainer.querySelector(`[data-answer-id="${answer.id}"]`).classList.add('bg-green-600');
+                        }
+                    });
                 }
+                updateNavigationButtons();
             }
 
             // --- Feedback Functions ---
 
             function hideFeedbackAndProceed() {
-                // Function to handle cleanup and moving to the next question
                 isPaused = false;
                 knowledgePopup.classList.remove('popup-show');
                 hazardOverlay.style.display = "none";
                 
-                // Wait for transitions to finish, then proceed
                 setTimeout(() => {
                     knowledgePopup.style.display = "none";
-                    nextQuestion();
+                    
+                    const currentQ = quizHistory[currentQuestionIndex];
+
+                    // Only automatically advance if an answer was just processed AND it's not the last question
+                    if (currentQ.isAnswered) { 
+                        if (currentQuestionIndex < quizHistory.length - 1) {
+                            currentQuestionIndex++;
+                            showQuestion();
+                        } else {
+                            endGame(); // If it was the last question, show results
+                        }
+                    } else {
+                        // User manually closed popup on an unanswered question, just update nav
+                        updateNavigationButtons(); 
+                    }
                 }, 500); 
             }
 
@@ -438,50 +556,90 @@
                 knowledgeText.textContent = knowledgePoint;
                 knowledgePopup.style.display = "block";
                 setTimeout(() => knowledgePopup.classList.add('popup-show'), 50);
-                
-                // No auto-timeout, relies on manual close
             }
 
             function showIncorrectFeedback(incorrectFeedback) {
                 hazardExplanation.innerHTML = incorrectFeedback;
                 hazardOverlay.style.display = "flex";
 
-                // Auto-close after 3 seconds if not manually closed
                 setTimeout(() => {
-                    if (isPaused) {
-                         // Only proceed if the user hasn't already closed it
+                    if (isPaused) { // If still paused after 3s, auto-close
                         hideFeedbackAndProceed();
                     }
                 }, 3000); 
             }
+            
+            // --- Navigation ---
 
             function nextQuestion() {
-                currentQuestionIndex++;
-                if (currentQuestionIndex < questions.length) {
+                if (currentQuestionIndex < quizHistory.length - 1) {
+                    currentQuestionIndex++;
                     showQuestion();
-                } else {
+                } else if (currentQuestionIndex === quizHistory.length - 1) {
                     endGame();
                 }
             }
 
+            function previousQuestion() {
+                if (currentQuestionIndex > 0) {
+                    currentQuestionIndex--;
+                    showQuestion();
+                }
+            }
+            
+            // --- Final Score ---
+
             function endGame() {
                 scoreSection.classList.remove('hidden'); 
-                const finalScoreText = `${score} out of ${questions.length}`;
+                const finalScoreText = `${score} out of ${quizHistory.length}`;
                 finalScoreDisplay.textContent = finalScoreText; 
                 document.getElementById("question-section").classList.add('hidden'); 
                 
                 if (score > 10) {
                     finalMessage.textContent = "EXCELLENT CYBER AWARENESS!";
-                    finalMessage.classList.remove('text-blue-400');
+                    finalMessage.classList.remove('text-blue-400', 'text-red-400');
                     finalMessage.classList.add('text-green-400');
-                    scoreAdvice.textContent = "Your high score shows you are vigilant and ready to handle most common digital threats. Great job staying secure!";
+                    scoreAdvice.textContent = "Your high score shows you are highly vigilant and ready to handle most common digital threats. Great job staying secure!";
                 } else {
                     finalMessage.textContent = "AWARENESS BOOST NEEDED";
-                    finalMessage.classList.remove('text-blue-400');
+                    finalMessage.classList.remove('text-blue-400', 'text-green-400');
                     finalMessage.classList.add('text-red-400');
                     scoreAdvice.textContent = "Your score indicates some key concepts need review. To be safe, focus on the real-life tips provided in the quiz and read the resources below to understand more about cyber attacks.";
                 }
             }
 
+
+            // --- Event Listeners ---
+            themeToggleBtn.addEventListener("click", toggleTheme);
+            startQuizBtn.addEventListener("click", startGame);
+            viewBlogsBtn.addEventListener("click", () => showView('blogs'));
+            closeQuizBtn.addEventListener("click", () => showView('home'));
+            backToMenuBlogsBtn.addEventListener("click", () => showView('home'));
+            restartButton.addEventListener("click", startGame); // restart btn on score screen
+
+            prevQBtn.addEventListener("click", previousQuestion);
+            
+            // Modified next button to allow constant movement
+            nextQBtn.addEventListener("click", () => {
+                if (currentQuestionIndex === quizHistory.length - 1) {
+                    endGame();
+                } else {
+                    currentQuestionIndex++;
+                    showQuestion();
+                }
+            });
+
+            knowledgeCloseBtn.addEventListener('click', () => {
+                if (isPaused) { hideFeedbackAndProceed(); }
+            });
+
+            hazardCloseBtn.addEventListener('click', () => {
+                if (isPaused) { hideFeedbackAndProceed(); }
+            });
+            
+            // Initial call to set the theme and view
+            toggleTheme(); // Set default (Dark) theme on load
+            showView('home');
+
         })();
- 
+   

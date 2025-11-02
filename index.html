@@ -8,25 +8,87 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="script.js" defer></script>
     <style>
-        /* Define custom styles and animations for the dramatic feedback */
+        /* Define custom styles for responsiveness and themes */
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600;800&display=swap');
         
+        /* Base styles (Dark Theme Default) */
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #1f2937 0%, #0f172a 100%);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-        }
+            transition: background-color 0.3s, color 0.3s;
+            background-attachment: fixed;
+            
+            /* Layered Dynamic Background (Dark Mode) */
+            background-color: #0f172a; /* Slate 900 base */
+            background-image: 
+                /* Subtle overlay to ensure card readability */
+                linear-gradient(rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.95)), 
+                /* Image 1: Large network map */
+                url('https://placehold.co/1920x1080/0f172a/3b82f6?text=NETWORK'),
+                /* Image 2: Lock icon (smaller) */
+                url('https://placehold.co/1920x1080/0f172a/3b82f6?text=LOCK'),
+                /* Image 3: Data flow (small) */
+                url('https://placehold.co/1920x1080/0f172a/3b82f6?text=DATA');
 
+            background-size: cover, 450px 450px, 300px 300px, 200px 200px;
+            background-position: center, 10% 10%, 80% 40%, 30% 90%;
+            background-repeat: no-repeat;
+            background-blend-mode: normal, lighten, screen, overlay; 
+
+            color: #e2e8f0; /* Slate 200 */
+        }
         .game-card {
-            background: rgba(30, 41, 59, 0.95); /* Slate 800 with transparency */
+            background: rgba(30, 41, 59, 0.95); /* Slate 800 with transparency (Dark Theme) */
             border: 2px solid #3b82f6; /* Blue border */
             box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+            transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
         }
 
-        /* --- RED HAZARD SCREEN STYLES (Simplified) --- */
+        /* Question Text Color (Dark Mode Default) */
+        body #question-text {
+            color: #e2e8f0; /* Light text for dark background */
+        }
+
+        /* LIGHT THEME Overrides (Refined Sky Blue Palette) */
+        body.light {
+            background-color: #cce9f5; /* Light Blue background */
+            color: #1e293b; /* Dark text */
+            
+            /* Layered Dynamic Background (Light Mode) */
+            background-image: 
+                /* Subtle overlay to ensure card readability */
+                linear-gradient(rgba(204, 233, 245, 0.95), rgba(204, 233, 245, 0.95)), 
+                /* Image 1: Large network map */
+                url('https://placehold.co/1920x1080/cce9f5/0284c7?text=NETWORK'),
+                /* Image 2: Lock icon (smaller) */
+                url('https://placehold.co/1920x1080/cce9f5/0284c7?text=LOCK'),
+                /* Image 3: Data flow (small) */
+                url('https://placehold.co/1920x1080/cce9f5/0284c7?text=DATA');
+            background-size: cover, 450px 450px, 300px 300px, 200px 200px;
+            background-position: center, 10% 10%, 80% 40%, 30% 90%;
+            background-repeat: no-repeat;
+            background-blend-mode: normal, lighten, screen, overlay; 
+        }
+        body.light .game-card {
+            background: rgba(255, 255, 255, 0.98); /* Near white card for high contrast */
+            border: 2px solid #0284c7; /* Darker blue border */ 
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        }
+        body.light .bg-gray-700 { background-color: #89cff0 !important; /* Lighter blue progress/score headers */ }
+        body.light .text-gray-200 { color: #1e293b !important; }
+        body.light .text-gray-400 { color: #475569 !important; }
+        body.light .border-gray-600 { border-color: #0284c7 !important; }
+        body.light #final-message.text-red-400 { color: #dc2626 !important; }
+
+        /* Question Text Color (Light Mode Override - Dark Brown) */
+        body.light #question-text {
+            color: #582C0E; /* Dark Brown for Light Mode Visibility */
+        }
+
+        /* --- HAZARD SCREEN STYLES (Orange Alert) --- */
         #hazard-overlay {
             position: fixed;
             top: 0;
@@ -42,7 +104,7 @@
             backdrop-filter: blur(5px);
             background-color: rgba(234, 88, 12, 0.98); /* Orange 600 for Alert/Danger */
             color: white;
-            border: 8px solid #b45309; /* Deep Orange Border */
+            border: 8px solid #b45309; 
         }
 
         #hazard-overlay h2 {
@@ -52,7 +114,7 @@
             text-shadow: 0 0 8px rgba(253, 186, 116, 0.7);
         }
 
-        /* --- KNOWLEDGE POPUP STYLES --- */
+        /* --- KNOWLEDGE POPUP STYLES (Green Success) --- */
         #knowledge-popup {
             position: fixed;
             top: 50%;
@@ -111,7 +173,19 @@
         }
     </style>
 </head>
-<body class="p-4">
+<body class="p-4 dark">
+
+    <!-- Theme Toggle -->
+    <button id="theme-toggle" class="fixed top-4 right-4 z-50 bg-gray-700 text-white p-3 rounded-full shadow-lg transition duration-300 hover:bg-gray-600 light:bg-gray-200 light:text-gray-800">
+        <!-- Sun icon for Dark Theme / Moon icon for Light Theme -->
+        <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+        <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
+    </button>
+
 
     <!-- Red Hazard Screen Overlay (for incorrect answers) -->
     <div id="hazard-overlay" class="p-8">
@@ -136,19 +210,27 @@
         </div>
     </div>
 
-    <!-- Landing Page -->
-    <div id="landing-page" class="game-card max-w-2xl mx-auto mt-20 p-8 rounded-xl">
-        <h1 class="text-4xl font-extrabold text-blue-400 mb-4 font-orbitron">Cyber Defense Awareness Quiz</h1>
-        <p class="text-gray-300 text-lg mb-8">Test your knowledge on daily scams, strong passwords, and data safety. This is a **20-question, self-paced** quiz designed for non-technical users to improve awareness.</p>
-        <button id="start-game-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition duration-200 transform hover:scale-105 shadow-lg">
-            Start Awareness Training
-        </button>
+    <!-- HOME MENU -->
+    <div id="landing-page" class="game-card max-w-2xl mx-auto mt-20 p-8 rounded-xl text-center">
+        <h1 class="text-4xl font-extrabold text-blue-400 mb-6 font-orbitron">Cyber Awareness Platform</h1>
+        <p class="text-gray-300 text-lg mb-10">Select an option to begin your training or review resources.</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <button id="start-quiz-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg transition duration-200 transform hover:scale-105 shadow-lg flex flex-col items-center justify-center">
+                <span class="text-2xl mb-1">🧠</span>
+                Take Awareness Quiz
+            </button>
+            <button id="view-blogs-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-8 rounded-lg transition duration-200 transform hover:scale-105 shadow-lg flex flex-col items-center justify-center">
+                <span class="text-2xl mb-1">📚</span>
+                Read Awareness Blogs
+            </button>
+        </div>
     </div>
 
-    <!-- Game Page -->
+    <!-- GAME PAGE -->
     <main id="game-container" class="max-w-xl mx-auto mt-10 p-6 rounded-xl game-card hidden">
         
-        <!-- Progress & Score Display -->
+        <!-- Navigation Header -->
         <div class="flex justify-between items-center mb-6 text-gray-200">
             <div id="progress-display" class="font-mono text-xl bg-gray-700 py-2 px-4 rounded-md border border-gray-600">
                 Q <span id="current-q-num">1</span> / <span id="total-questions">20</span>
@@ -156,11 +238,14 @@
             <div class="font-mono text-xl bg-gray-700 py-2 px-4 rounded-md border border-gray-600">
                 Score: <span id="current-score" class="text-green-400 font-bold">0</span>
             </div>
+            <button id="close-quiz-btn" class="text-sm text-red-400 hover:text-red-500 transition duration-150">
+                Back to Menu
+            </button>
         </div>
 
         <!-- Question Section -->
         <section id="question-section">
-            <h2 id="question-text" class="text-2xl font-semibold text-white mb-6">Question will appear here...</h2>
+            <h2 id="question-text" class="text-2xl font-semibold mb-6">Question will appear here...</h2>
             
             <div id="multi-select-prompt" class="text-yellow-400 text-sm font-bold mb-3 hidden">
                 **MULTI-SELECT:** Click all the correct options, then click SUBMIT.
@@ -175,9 +260,19 @@
             </button>
         </section>
 
+        <!-- Previous/Next Navigation -->
+        <div class="flex justify-between mt-6 pt-4 border-t border-gray-700">
+            <button id="prev-q-btn" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg flex items-center disabled:opacity-50">
+                &larr; Previous
+            </button>
+            <button id="next-q-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center disabled:opacity-50">
+                Next &rarr;
+            </button>
+        </div>
+
         <!-- Game Over Section -->
-        <section id="score-section" class="hidden text-white text-center p-8">
-            <h2 id="final-message" class="text-4xl font-extrabold text-blue-400 mb-4 font-orbitron">MISSION COMPLETE!</h2>
+        <section id="score-section" class="absolute inset-0 bg-gray-900 bg-opacity-95 rounded-xl text-white text-center p-8 hidden">
+            <h2 id="final-message" class="4xl font-extrabold text-blue-400 mb-4 font-orbitron">MISSION COMPLETE!</h2>
             <p class="text-xl mb-4">Your final awareness score is: <span id="final-score" class="font-bold text-green-400"></span></p>
             <p id="score-advice" class="text-lg mb-8 text-gray-300"></p>
 
@@ -197,10 +292,53 @@
         </section>
         
     </main>
+    
+    <!-- BLOGS SECTION (Updated for India-specific context) -->
+    <section id="blog-section" class="game-card max-w-3xl mx-auto mt-10 p-8 rounded-xl hidden">
+        <h2 class="text-3xl font-extrabold text-purple-400 mb-6 font-orbitron">Cyber Awareness Blogs & Resources (India Focus)</h2>
+        <p class="text-lg text-gray-300 mb-6">These resources address common digital and financial threats prevalent in the Indian digital landscape. Knowledge is your strongest defense!</p>
+        
+        <div class="space-y-4">
+            <!-- Blog 1: Financial Scams (Vishing, OTP, KYC) -->
+            <div class="p-4 bg-gray-800 rounded-lg border border-gray-700">
+                <h3 class="text-xl font-bold text-white mb-1">Vishing, OTP, and KYC Scams: Protecting Your Wallet</h3>
+                <p class="text-sm text-gray-400 mb-2">
+                    Fraudsters often call, claiming your bank account or KYC verification is blocked, demanding your **OTP (One-Time Password)** or personal details to 'unblock' it.
+                    **Remember:** Legitimate banks and financial institutions will never call or message to ask for your OTP, PIN, or password. If in doubt, hang up and call the official bank number yourself.
+                </p>
+                <a href="https://cybercrime.gov.in/" target="_blank" class="text-blue-400 hover:underline text-sm font-semibold">Report Scams & Learn More (Cyber Crime Portal, India) &rarr;</a>
+            </div>
+            
+            <!-- Blog 2: UPI and Digital Wallet Safety -->
+            <div class="p-4 bg-gray-800 rounded-lg border border-gray-700">
+                <h3 class="text-xl font-bold text-white mb-1">Safe UPI and Digital Wallet Transactions</h3>
+                <p class="text-sm text-gray-400 mb-2">
+                    UPI scams often involve fraudsters sending a **'Request Money'** link which, if approved, debits your account instead of crediting it.
+                    **Always remember:** You only need to enter your UPI PIN when you are **sending** money, not when you are **receiving** it. Treat your UPI PIN with the same confidentiality as your ATM PIN.
+                </p>
+                <a href="https://www.npci.org.in/what-we-do/upi/product-overview" target="_blank" class="text-blue-400 hover:underline text-sm font-semibold">NPCI Guidelines (Authoritative UPI Information) &rarr;</a>
+            </div>
+
+            <!-- Blog 3: Mobile & Physical Data Protection (Aadhaar/PAN) -->
+            <div class="p-4 bg-gray-800 rounded-lg border border-gray-700">
+                <h3 class="text-xl font-bold text-white mb-1">Securing Your Mobile and Personal Data (Aadhaar/PAN)</h3>
+                <p class="text-sm text-gray-400 mb-2">
+                    Your phone is the gateway to your financial life. **Ensure you always use a strong screen lock and enable device encryption.** Furthermore, be extremely cautious when sharing physical copies of sensitive documents like your **Aadhaar** or **PAN card**. Use 'Masked Aadhaar' when possible and redact the last four digits of sensitive IDs on copies.
+                </p>
+                <a href="https://uidai.gov.in/my-aadhaar/about-your-aadhaar/safety-security.html" target="_blank" class="text-blue-400 hover:underline text-sm font-semibold">Official UIDAI Security Tips &rarr;</a>
+            </div>
+        </div>
+
+        <button id="back-to-menu-blogs-btn" class="mt-8 bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-6 rounded-lg transition duration-200">
+            Back to Menu
+        </button>
+    </section>
+
 
     <footer class="text-center text-gray-500 p-4 mt-8">
         <p class="text-sm">Quiz developed for public cybersecurity awareness.</p>
     </footer>
 
-    </body>
+    
+</body>
 </html>
