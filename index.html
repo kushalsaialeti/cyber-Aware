@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyber Defense Awareness Quiz</title>
+    <title>సైబర్ అవగాహన క్విజ్ | Cyber Defense Awareness Quiz</title>
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="script.js" defer></script>
     <style>
         /* Define custom styles for responsiveness and themes */
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600;800&display=swap');
@@ -27,11 +26,11 @@
                 /* Subtle overlay to ensure card readability */
                 linear-gradient(rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.95)), 
                 /* Image 1: Large network map */
-                url('aec2a154-e35f-4ec6-972d-bf7941fb126b.png'),
+                url('https://placehold.co/1920x1080/0f172a/3b82f6?text=NETWORK'),
                 /* Image 2: Lock icon (smaller) */
-                url('b0ea5588-e5c6-4866-824d-b850cfedd7a6.png'),
+                url('https://placehold.co/1920x1080/0f172a/3b82f6?text=LOCK'),
                 /* Image 3: Data flow (small) */
-                url('https://images.unsplash.com/photo-1599488615732-8a1e2e6f1c49?auto=format&fit=crop&w=1200&q=60');
+                url('https://placehold.co/1920x1080/0f172a/3b82f6?text=DATA');
 
             background-size: cover, 450px 450px, 300px 300px, 200px 200px;
             background-position: center, 10% 10%, 80% 40%, 30% 90%;
@@ -62,11 +61,11 @@
                 /* Subtle overlay to ensure card readability */
                 linear-gradient(rgba(204, 233, 245, 0.95), rgba(204, 233, 245, 0.95)), 
                 /* Image 1: Large network map */
-                url('aec2a154-e35f-4ec6-972d-bf7941fb126b.png'),
+                url('https://placehold.co/1920x1080/cce9f5/0284c7?text=NETWORK'),
                 /* Image 2: Lock icon (smaller) */
-                url('b0ea5588-e5c6-4866-824d-b850cfedd7a6.png'),
+                url('https://placehold.co/1920x1080/cce9f5/0284c7?text=LOCK'),
                 /* Image 3: Data flow (small) */
-                url('https://images.unsplash.com/photo-1599488615732-8a1e2e6f1c49?auto=format&fit=crop&w=1200&q=60');
+                url('https://placehold.co/1920x1080/cce9f5/0284c7?text=DATA');
             background-size: cover, 450px 450px, 300px 300px, 200px 200px;
             background-position: center, 10% 10%, 80% 40%, 30% 90%;
             background-repeat: no-repeat;
@@ -86,6 +85,13 @@
         /* Question Text Color (Light Mode Override - Dark Brown) */
         body.light #question-text {
             color: #582C0E; /* Dark Brown for Light Mode Visibility */
+        }
+        /* Bilingual Text Styling */
+        .telugu-text {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-top: 4px;
+            display: block;
         }
 
         /* --- HAZARD SCREEN STYLES (Orange Alert) --- */
@@ -153,6 +159,8 @@
         .answer-btn {
             transition: all 0.2s ease-in-out;
             box-shadow: 0 4px #1e40af; 
+            white-space: normal; /* Allow text to wrap */
+            height: auto;
         }
 
         .answer-btn:hover:not(:disabled) {
@@ -194,35 +202,36 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mr-4" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M8.257 3.34c.73-.594 1.73-.594 2.46 0l5.48 4.416A3 3 0 0118 10.386v4.214a4 4 0 01-4 4H6a4 4 0 01-4-4v-4.214c0-1.164.54-2.28 1.487-3.03l5.48-4.415zM11 14a1 1 0 10-2 0 1 1 0 002 0zm-1-7a1 1 0 00-1 1v3a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
             </svg>
-            SYSTEM ALERT!
+            <span class="text-3xl">SYSTEM ALERT!</span>
+            <span class="telugu-text text-xl font-normal ml-3 mt-1">సిస్టమ్ హెచ్చరిక!</span>
         </h2>
         <p id="hazard-explanation" class="text-xl max-w-2xl font-semibold mb-4"></p>
-        <p class="text-lg mt-4 font-bold text-yellow-200">⚠ READ THIS ADVICE TO STAY SAFE! (Auto-close in 3s or click X)</p>
+        <p class="text-lg mt-4 font-bold text-yellow-200">⚠️ READ THIS ADVICE TO STAY SAFE! (Auto-close in 3s or click X)</p>
     </div>
 
     <!-- Knowledge Point Pop-up (for correct answers) -->
     <div id="knowledge-popup">
         <button id="knowledge-close-btn" class="close-btn text-white hover:text-gray-200">&times;</button>
         <div class="text-center">
-            <h3 class="text-2xl font-bold mb-2">✅ Correct Answer!</h3>
-            <p class="text-sm font-light mb-4">You've earned a Cybersecurity Knowledge Point!</p>
+            <h3 class="text-2xl font-bold mb-2">✅ Correct Answer! <span class="telugu-text font-normal italic">సరైన సమాధానం!</span></h3>
+            <p class="text-sm font-light mb-4">You've earned a Cybersecurity Knowledge Point! <span class="telugu-text font-light italic">మీరు సైబర్ సెక్యూరిటీ జ్ఞాన పాయింట్‌ను సంపాదించారు!</span></p>
             <p id="knowledge-text" class="text-base italic font-medium"></p>
         </div>
     </div>
 
     <!-- HOME MENU -->
     <div id="landing-page" class="game-card max-w-2xl mx-auto mt-20 p-8 rounded-xl text-center">
-        <h1 class="text-4xl font-extrabold text-blue-400 mb-6 font-orbitron">Cyber Awareness Platform</h1>
-        <p class="text-gray-300 text-lg mb-10">Select an option to begin your training or review resources.</p>
+        <h1 class="text-4xl font-extrabold text-blue-400 mb-6 font-orbitron">Cyber Awareness Platform <span class="telugu-text text-2xl font-normal block mt-1">సైబర్ అవగాహన వేదిక</span></h1>
+        <p class="text-gray-300 text-lg mb-10">Select an option to begin your training or review resources. <span class="telugu-text block">మీ శిక్షణను ప్రారంభించడానికి లేదా వనరులను సమీక్షించడానికి ఒక ఎంపికను ఎంచుకోండి.</span></p>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <button id="start-quiz-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg transition duration-200 transform hover:scale-105 shadow-lg flex flex-col items-center justify-center">
                 <span class="text-2xl mb-1">🧠</span>
-                Take Awareness Quiz
+                Take Awareness Quiz <span class="telugu-text text-base mt-1">అవగాహన క్విజ్ తీసుకోండి</span>
             </button>
             <button id="view-blogs-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-8 rounded-lg transition duration-200 transform hover:scale-105 shadow-lg flex flex-col items-center justify-center">
                 <span class="text-2xl mb-1">📚</span>
-                Read Awareness Blogs
+                Read Awareness Blogs <span class="telugu-text text-base mt-1">అవగాహన బ్లాగులు చదవండి</span>
             </button>
         </div>
     </div>
@@ -234,21 +243,24 @@
         <div class="flex justify-between items-center mb-6 text-gray-200">
             <div id="progress-display" class="font-mono text-xl bg-gray-700 py-2 px-4 rounded-md border border-gray-600">
                 Q <span id="current-q-num">1</span> / <span id="total-questions">20</span>
+                <span class="telugu-text block text-sm">ప్ర. <span id="current-q-num-te">1</span> / 20</span>
             </div>
             <div class="font-mono text-xl bg-gray-700 py-2 px-4 rounded-md border border-gray-600">
                 Score: <span id="current-score" class="text-green-400 font-bold">0</span>
+                <span class="telugu-text block text-sm">స్కోర్: <span id="current-score-te">0</span></span>
             </div>
             <button id="close-quiz-btn" class="text-sm text-red-400 hover:text-red-500 transition duration-150">
-                Back to Menu
+                Back to Menu <span class="telugu-text block">మెనూకి</span>
             </button>
         </div>
 
         <!-- Question Section -->
         <section id="question-section">
-            <h2 id="question-text" class="text-2xl font-semibold mb-6">Question will appear here...</h2>
+            <h2 id="question-text" class="text-2xl font-semibold mb-6"></h2>
             
             <div id="multi-select-prompt" class="text-yellow-400 text-sm font-bold mb-3 hidden">
-                *MULTI-SELECT:* Click all the correct options, then click SUBMIT.
+                **MULTI-SELECT:** Click all the correct options, then click SUBMIT.
+                <span class="telugu-text font-normal italic">బహుళ-ఎంపిక: సరైన ఎంపికలన్నింటినీ క్లిక్ చేసి, ఆపై సమర్పించండి.</span>
             </div>
 
             <div id="answers" class="grid grid-cols-1 gap-4">
@@ -256,89 +268,137 @@
             </div>
 
             <button id="submit-btn" class="hidden mt-6 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition duration-200 transform hover:scale-105 shadow-lg" disabled>
-                SUBMIT ANSWER
+                SUBMIT ANSWER <span class="telugu-text text-sm">సమాధానం సమర్పించండి</span>
             </button>
         </section>
 
         <!-- Previous/Next Navigation -->
         <div class="flex justify-between mt-6 pt-4 border-t border-gray-700">
             <button id="prev-q-btn" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg flex items-center disabled:opacity-50">
-                &larr; Previous
+                &larr; Previous <span class="telugu-text text-sm ml-2">మునుపటి</span>
             </button>
             <button id="next-q-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center disabled:opacity-50">
-                Next &rarr;
+                Next &rarr; <span class="telugu-text text-sm ml-2">తదుపరి</span>
             </button>
         </div>
 
         <!-- Game Over Section -->
         <section id="score-section" class="absolute inset-0 bg-gray-900 bg-opacity-95 rounded-xl text-white text-center p-8 hidden">
-            <h2 id="final-message" class="4xl font-extrabold text-blue-400 mb-4 font-orbitron">MISSION COMPLETE!</h2>
-            <p class="text-xl mb-4">Your final awareness score is: <span id="final-score" class="font-bold text-green-400"></span></p>
+            <h2 id="final-message" class="4xl font-extrabold text-blue-400 mb-4 font-orbitron"></h2>
+            <p class="text-xl mb-4">Your final awareness score is: <span id="final-score" class="font-bold text-green-400"></span><span class="telugu-text block text-lg font-normal">మీ తుది అవగాహన స్కోర్: <span id="final-score-te"></span></span></p>
             <p id="score-advice" class="text-lg mb-8 text-gray-300"></p>
 
             <div class="text-left bg-gray-800 p-6 rounded-lg mb-8">
-                <h3 class="text-xl font-bold text-yellow-400 mb-3">Continue Your Learning:</h3>
+                <h3 class="text-xl font-bold text-yellow-400 mb-3">Continue Your Learning: <span class="telugu-text font-normal">మీ అభ్యాసాన్ని కొనసాగించండి:</span></h3>
                 <p class="text-sm text-gray-400 mb-2">Here are some recommended resources to boost your security knowledge:</p>
                 <ul class="list-disc list-inside text-sm text-blue-300 space-y-1">
+                    <li><a href="https://cybercrime.gov.in/" target="_blank" class="hover:underline">India Cyber Crime Portal: Report and Learn More</a></li>
                     <li><a href="https://staysafeonline.org/" target="_blank" class="hover:underline">National Cyber Security Alliance (NCSA) Blog</a></li>
-                    <li><a href="https://krebsonsecurity.com/" target="_blank" class="hover:underline">Krebs on Security (for deep dives into real hacks)</a></li>
                     <li><a href="https://www.cisa.gov/cyber-hygiene-vulnerability-management" target="_blank" class="hover:underline">CISA Cyber Hygiene Resources</a></li>
                 </ul>
             </div>
 
             <button id="restart-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition duration-200 transform hover:scale-105">
-                Rerun Simulation
+                Rerun Simulation <span class="telugu-text text-sm">సిమ్యులేషన్‌ను తిరిగి అమలు చేయండి</span>
             </button>
         </section>
         
     </main>
     
-    <!-- BLOGS SECTION (Updated for India-specific context) -->
+    <!-- BLOGS SECTION (Bilingual Tabs) -->
     <section id="blog-section" class="game-card max-w-3xl mx-auto mt-10 p-8 rounded-xl hidden">
-        <h2 class="text-3xl font-extrabold text-purple-400 mb-6 font-orbitron">Cyber Awareness Blogs & Resources (India Focus)</h2>
-        <p class="text-lg text-gray-300 mb-6">These resources address common digital and financial threats prevalent in the Indian digital landscape. Knowledge is your strongest defense!</p>
+        <h2 class="text-3xl font-extrabold text-purple-400 mb-6 font-orbitron">Cyber Awareness Blogs & Resources <span class="telugu-text text-xl font-normal block">సైబర్ అవగాహన బ్లాగులు & వనరులు</span></h2>
         
-        <div class="space-y-4">
-            <!-- Blog 1: Financial Scams (Vishing, OTP, KYC) -->
-            <div class="p-4 bg-gray-800 rounded-lg border border-gray-700">
-                <h3 class="text-xl font-bold text-white mb-1">Vishing, OTP, and KYC Scams: Protecting Your Wallet</h3>
-                <p class="text-sm text-gray-400 mb-2">
-                    Fraudsters often call, claiming your bank account or KYC verification is blocked, demanding your *OTP (One-Time Password)* or personal details to 'unblock' it.
-                    *Remember:* Legitimate banks and financial institutions will never call or message to ask for your OTP, PIN, or password. If in doubt, hang up and call the official bank number yourself.
-                </p>
-                <a href="https://cybercrime.gov.in/" target="_blank" class="text-blue-400 hover:underline text-sm font-semibold">Report Scams & Learn More (Cyber Crime Portal, India) &rarr;</a>
-            </div>
-            
-            <!-- Blog 2: UPI and Digital Wallet Safety -->
-            <div class="p-4 bg-gray-800 rounded-lg border border-gray-700">
-                <h3 class="text-xl font-bold text-white mb-1">Safe UPI and Digital Wallet Transactions</h3>
-                <p class="text-sm text-gray-400 mb-2">
-                    UPI scams often involve fraudsters sending a *'Request Money'* link which, if approved, debits your account instead of crediting it.
-                    *Always remember:* You only need to enter your UPI PIN when you are *sending* money, not when you are *receiving* it. Treat your UPI PIN with the same confidentiality as your ATM PIN.
-                </p>
-                <a href="https://www.npci.org.in/what-we-do/upi/product-overview" target="_blank" class="text-blue-400 hover:underline text-sm font-semibold">NPCI Guidelines (Authoritative UPI Information) &rarr;</a>
-            </div>
+        <div class="mb-4 border-b border-gray-700">
+            <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="blog-tabs">
+                <li class="mr-2">
+                    <button id="english-tab" class="inline-block p-4 border-b-2 rounded-t-lg border-purple-500 text-purple-400 hover:border-purple-300">English Resources</button>
+                </li>
+                <li class="mr-2">
+                    <button id="telugu-tab" class="inline-block p-4 border-b-2 border-transparent hover:text-gray-300 hover:border-gray-300 text-gray-400">తెలుగు వనరులు</button>
+                </li>
+            </ul>
+        </div>
 
-            <!-- Blog 3: Mobile & Physical Data Protection (Aadhaar/PAN) -->
-            <div class="p-4 bg-gray-800 rounded-lg border border-gray-700">
-                <h3 class="text-xl font-bold text-white mb-1">Securing Your Mobile and Personal Data (Aadhaar/PAN)</h3>
-                <p class="text-sm text-gray-400 mb-2">
-                    Your phone is the gateway to your financial life. *Ensure you always use a strong screen lock and enable device encryption.* Furthermore, be extremely cautious when sharing physical copies of sensitive documents like your *Aadhaar* or *PAN card*. Use 'Masked Aadhaar' when possible and redact the last four digits of sensitive IDs on copies.
-                </p>
-                <a href="https://uidai.gov.in/my-aadhaar/about-your-aadhaar/safety-security.html" target="_blank" class="text-blue-400 hover:underline text-sm font-semibold">Official UIDAI Security Tips &rarr;</a>
+        <!-- English Blog Content -->
+        <div id="english-content">
+            <p class="text-lg text-gray-300 mb-6">These resources address common digital and financial threats prevalent in the Indian digital landscape. Knowledge is your strongest defense!</p>
+            <div class="space-y-4">
+                <!-- Blog 1: Financial Scams (Vishing, OTP, KYC) -->
+                <div class="p-4 bg-gray-800 rounded-lg border border-gray-700">
+                    <h3 class="text-xl font-bold text-white mb-1">Vishing, OTP, and KYC Scams: Protecting Your Wallet</h3>
+                    <p class="text-sm text-gray-400 mb-2">
+                        Fraudsters often call, claiming your bank account or KYC verification is blocked, demanding your **OTP (One-Time Password)** or personal details to 'unblock' it.
+                        **Remember:** Legitimate banks and financial institutions will never call or message to ask for your OTP, PIN, or password. If in doubt, hang up and call the official bank number yourself.
+                    </p>
+                    <a href="https://cybercrime.gov.in/" target="_blank" class="text-blue-400 hover:underline text-sm font-semibold">Report Scams & Learn More (Cyber Crime Portal, India) &rarr;</a>
+                </div>
+                
+                <!-- Blog 2: UPI and Digital Wallet Safety -->
+                <div class="p-4 bg-gray-800 rounded-lg border border-gray-700">
+                    <h3 class="text-xl font-bold text-white mb-1">Safe UPI and Digital Wallet Transactions</h3>
+                    <p class="text-sm text-gray-400 mb-2">
+                        UPI scams often involve fraudsters sending a **'Request Money'** link which, if approved, debits your account instead of crediting it.
+                        **Always remember:** You only need to enter your UPI PIN when you are **sending** money, not when you are **receiving** it. Treat your UPI PIN with the same confidentiality as your ATM PIN.
+                    </p>
+                    <a href="https://www.npci.org.in/what-we-do/upi/product-overview" target="_blank" class="text-blue-400 hover:underline text-sm font-semibold">NPCI Guidelines (Authoritative UPI Information) &rarr;</a>
+                </div>
+
+                <!-- Blog 3: Mobile & Physical Data Protection (Aadhaar/PAN) -->
+                <div class="p-4 bg-gray-800 rounded-lg border border-gray-700">
+                    <h3 class="text-xl font-bold text-white mb-1">Securing Your Mobile and Personal Data (Aadhaar/PAN)</h3>
+                    <p class="text-sm text-gray-400 mb-2">
+                        Your phone is the gateway to your financial life. **Ensure you always use a strong screen lock and enable device encryption.** Furthermore, be extremely cautious when sharing physical copies of sensitive documents like your **Aadhaar** or **PAN card**. Use 'Masked Aadhaar' when possible and redact the last four digits of sensitive IDs on copies.
+                    </p>
+                    <a href="https://uidai.gov.in/my-aadhaar/about-your-aadhaar/safety-security.html" target="_blank" class="text-blue-400 hover:underline text-sm font-semibold">Official UIDAI Security Tips &rarr;</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Telugu Blog Content -->
+        <div id="telugu-content" class="hidden">
+            <p class="text-lg text-gray-300 mb-6">భారతదేశంలో సర్వసాధారణంగా ఉన్న డిజిటల్ మరియు ఆర్థికపరమైన బెదిరింపులను ఈ వనరులు అందిస్తున్నాయి. జ్ఞానమే మీ బలమైన రక్షణ!</p>
+            <div class="space-y-4">
+                <!-- Blog 1: Vishing, OTP, and KYC Scams (Telugu) -->
+                <div class="p-4 bg-gray-800 rounded-lg border border-gray-700">
+                    <h3 class="text-xl font-bold text-white mb-1">వోషింగ్, OTP మరియు KYC స్కామ్‌లు: మీ డబ్బును రక్షించుకోండి</h3>
+                    <p class="text-sm text-gray-400 mb-2">
+                        మీ బ్యాంక్ ఖాతా లేదా KYC నిలిపివేయబడిందని, దానిని 'అన్‌బ్లాక్' చేయడానికి మీ **OTP (వన్-టైమ్ పాస్‌వర్డ్)** లేదా వ్యక్తిగత వివరాలను అడుగుతూ మోసగాళ్ళు తరచుగా కాల్ చేస్తారు.
+                        **గుర్తుంచుకోండి:** నిజమైన బ్యాంకులు మరియు ఆర్థిక సంస్థలు ఎప్పుడూ OTP, PIN లేదా పాస్‌వర్డ్‌ను అడగడానికి కాల్ చేయవు లేదా మెసేజ్ చేయవు. అనుమానం ఉంటే, కాల్ కట్ చేసి, మీ బ్యాంక్ యొక్క అధికారిక నంబర్‌కు మీరే కాల్ చేయండి.
+                    </p>
+                    <a href="https://cybercrime.gov.in/" target="_blank" class="text-blue-400 hover:underline text-sm font-semibold">మోసాలను నివేదించండి మరియు మరింత తెలుసుకోండి (సైబర్ క్రైమ్ పోర్టల్, ఇండియా) &rarr;</a>
+                </div>
+                
+                <!-- Blog 2: UPI Safety (Telugu) -->
+                <div class="p-4 bg-gray-800 rounded-lg border border-gray-700">
+                    <h3 class="text-xl font-bold text-white mb-1">సురక్షిత UPI మరియు డిజిటల్ వాలెట్ లావాదేవీలు</h3>
+                    <p class="text-sm text-gray-400 mb-2">
+                        మోసగాళ్ళు **'డబ్బును అభ్యర్థించండి'** లింక్‌ను పంపడం ద్వారా UPI స్కామ్‌లు చేస్తారు, మీరు ఆమోదిస్తే, మీ ఖాతా నుండి డబ్బు కట్ అవుతుంది.
+                        **ఎల్లప్పుడూ గుర్తుంచుకోండి:** మీరు డబ్బు **పంపేటప్పుడు** మాత్రమే మీ UPI PIN ఎంటర్ చేయాలి, **స్వీకరించేటప్పుడు** కాదు.
+                    </p>
+                    <a href="https://www.npci.org.in/what-we-do/upi/product-overview" target="_blank" class="text-blue-400 hover:underline text-sm font-semibold">NPCI మార్గదర్శకాలు (అధికారిక UPI సమాచారం) &rarr;</a>
+                </div>
+
+                <!-- Blog 3: Mobile & Personal Data Protection (Telugu) -->
+                <div class="p-4 bg-gray-800 rounded-lg border border-gray-700">
+                    <h3 class="text-xl font-bold text-white mb-1">మీ మొబైల్ మరియు వ్యక్తిగత డేటాను సురక్షితం చేయడం (ఆధార్/పాన్)</h3>
+                    <p class="text-sm text-gray-400 mb-2">
+                        మీ ఫోన్ మీ ఆర్థిక జీవితానికి గేట్‌వే. **మీరు ఎల్లప్పుడూ బలమైన స్క్రీన్ లాక్‌ని ఉపయోగించి, పరికర ఎన్‌క్రిప్షన్‌ను ప్రారంభించారని నిర్ధారించుకోండి.** అంతేకాకుండా, మీ **ఆధార్** లేదా **పాన్ కార్డ్** వంటి సున్నితమైన పత్రాల భౌతిక కాపీలను పంచుకునేటప్పుడు చాలా జాగ్రత్తగా ఉండండి.
+                    </p>
+                    <a href="https://uidai.gov.in/my-aadhaar/about-your-aadhaar/safety-security.html" target="_blank" class="text-blue-400 hover:underline text-sm font-semibold">అధికారిక UIDAI భద్రతా చిట్కాలు &rarr;</a>
+                </div>
             </div>
         </div>
 
         <button id="back-to-menu-blogs-btn" class="mt-8 bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-6 rounded-lg transition duration-200">
-            Back to Menu
+            Back to Menu <span class="telugu-text text-sm">మెనూకి</span>
         </button>
     </section>
 
 
     <footer class="text-center text-gray-500 p-4 mt-8">
-        <p class="text-sm">Quiz developed for public cybersecurity awareness.</p>
+        <p class="text-sm">Quiz developed for public cybersecurity awareness. <span class="telugu-text">ప్రజా సైబర్ అవగాహన కోసం అభివృద్ధి చేయబడిన క్విజ్.</span></p>
     </footer>
 
-    
-</body>
+    </body>
 </html>
